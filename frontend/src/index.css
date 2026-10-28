@@ -1,16 +1,128 @@
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 :root {
-  font-family: 'DM Sans', sans-serif;
-  color: #e7eee9;
-  background: #0d1411;
+  font-family: "Inter", sans-serif;
+  color: #24352b;
+  background: #f5f8f5;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --primary-green: #208653;
+  --primary-green-dark: #176c42;
+  --light-green: #e8f5ec;
+  --text-primary: #24352b;
+  --text-secondary: #758279;
+  --border-color: #e4ebe5;
+  --card-background: #ffffff;
+  --page-background: #f5f8f5;
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; min-height: 100vh; }
-button { font-family: inherit; }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  min-height: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 24px;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--page-background);
+  color: var(--text-primary);
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  color: inherit;
+  font-family: inherit;
+}
+
+p {
+  margin-top: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+svg {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+img {
+  max-width: 100%;
+}
+
+ul,
+ol {
+  padding-left: 20px;
+}
+
+::selection {
+  color: #ffffff;
+  background: #208653;
+}
+
+:focus-visible {
+  outline: 3px solid #9bd9b4;
+  outline-offset: 3px;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f4f0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd7cd;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aab9ad;
+}

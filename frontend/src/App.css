@@ -1,26 +1,22 @@
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
-
-/* =========================================
-   1. GLOBAL STYLES
-========================================= */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 :root {
-  font-family: 'DM Sans', sans-serif;
-  color: #e7eee9;
-  background: #0d1411;
+  font-family: "Inter", sans-serif;
+  color: #24352b;
+  background: #f5f8f5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  font-optical-sizing: auto;
-  font-weight: 400;
+  -moz-osx-font-smoothing: grayscale;
 
-  --green: #39b879;
-  --green-light: #65d895;
-  --muted: #899990;
-  --border: #25342b;
-  --panel: #131d17;
-  --background: #0d1411;
+  --green: #208653;
+  --green-dark: #176c42;
+  --green-light: #e8f5ec;
+  --text: #24352b;
+  --muted: #758279;
+  --border: #e4ebe5;
+  --surface: #ffffff;
 }
 
 * {
@@ -28,1082 +24,1155 @@
 }
 
 html {
-  min-width: 320px;
   scroll-behavior: smooth;
+  scroll-padding-top: 24px;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: #f5f8f5;
+}
+
+body,
+button,
+input {
+  font-family: "Inter", sans-serif;
 }
 
 button,
 input {
-  font: inherit;
+  font-size: 14px;
 }
 
-button {
-  cursor: pointer;
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 button:focus-visible,
+a:focus-visible,
 input:focus-visible {
-  outline: 2px solid var(--green);
+  outline: 3px solid #9bd9b4;
   outline-offset: 3px;
-}
-
-button:disabled {
-  cursor: not-allowed;
 }
 
 #root {
   min-height: 100vh;
 }
 
+/* Main layout */
+
 .app-shell {
   min-height: 100vh;
-  background: var(--background);
 }
-
-/* =========================================
-   2. SIDEBAR
-========================================= */
 
 .sidebar {
   position: fixed;
   inset: 0 auto 0 0;
-  width: 245px;
-  background: #101813;
-  border-right: 1px solid var(--border);
-  padding: 28px 17px 18px;
+  z-index: 20;
   display: flex;
   flex-direction: column;
-  z-index: 100;
+  width: 248px;
+  padding: 28px 18px 20px;
   overflow-y: auto;
+  background: #ffffff;
+  border-right: 1px solid var(--border);
 }
+
+.main-content {
+  width: calc(100% - 248px);
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 248px;
+  padding: 36px 36px 24px;
+}
+
+/* Brand */
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 0 8px 35px;
+  gap: 12px;
+  padding: 0 4px;
+  margin-bottom: 42px;
 }
 
 .brand-icon {
   display: grid;
-  place-items: center;
-  width: 43px;
-  height: 43px;
   flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: var(--green);
+  background: var(--green-light);
   border-radius: 13px;
-  background: #183a29;
-  color: #54d992;
 }
 
-.brand h2 {
-  font: 800 17px 'Manrope', sans-serif;
-  letter-spacing: -0.7px;
+.brand h1 {
   margin: 0;
+  color: var(--text);
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.9px;
+  white-space: nowrap;
 }
 
 .brand span {
   display: block;
-  color: #8eaa98;
+  margin-top: 5px;
+  color: var(--muted);
   font-size: 9px;
-  letter-spacing: 1.7px;
-  margin-top: 3px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
 }
 
-.nav-label,
-.section-kicker {
+/* Sidebar navigation */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nav-heading {
+  margin: 0 0 9px 10px;
+  color: #98a39b;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.4px;
-  color: #8b9b90;
 }
 
-.nav-label {
-  padding: 0 12px 12px;
+.nav-heading-spaced {
+  margin-top: 30px;
 }
 
-.sidebar nav {
-  display: grid;
-  gap: 6px;
-}
-
-.nav-item {
+.nav-link {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  color: #9eada3;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  background: transparent;
-  text-align: left;
+  min-height: 43px;
+  padding: 0 12px;
+  color: #69766e;
   font-size: 13px;
+  font-weight: 500;
+  border-radius: 9px;
   transition:
-    background 0.2s ease,
-    color 0.2s ease;
+    background 160ms ease,
+    color 160ms ease;
 }
 
-.nav-item:hover {
-  background: #19261e;
-  color: #e6f4e9;
+.nav-link:hover {
+  color: var(--green-dark);
+  background: #f3f8f4;
 }
 
-.nav-item.selected {
-  color: #6fe0a0;
-  background: #1a3023;
-  border-color: #284c35;
+.nav-link.active {
+  color: var(--green-dark);
+  background: var(--green-light);
+  font-weight: 600;
 }
 
-.sidebar-bottom {
-  margin-top: auto;
-  padding-top: 28px;
+.nav-link svg {
+  flex-shrink: 0;
 }
 
-.eco-card {
-  padding: 17px 15px;
-  background: linear-gradient(145deg, #193b29, #14251b);
-  border: 1px solid #2b4c36;
-  border-radius: 12px;
-  color: #6fe0a0;
+.sidebar-impact {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px 9px;
 }
 
-.eco-card h3 {
-  color: #e3f3e7;
-  font: 700 14px 'Manrope', sans-serif;
-  margin: 9px 0 0;
+.sidebar-impact-icon {
+  display: grid;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--green);
+  background: #f0f7f1;
+  border-radius: 10px;
 }
 
-.eco-card p {
-  color: #a2b9a8;
-  font-size: 11px;
-  line-height: 1.7;
-  margin-bottom: 0;
-}
-
-.sidebar-footer {
+.sidebar-impact strong,
+.sidebar-impact span {
   display: block;
-  font-size: 9px;
-  letter-spacing: 1px;
-  color: #728177;
-  padding: 22px 5px 0;
 }
 
-/* =========================================
-   3. MAIN LAYOUT AND HEADER
-========================================= */
-
-.main-content {
-  margin-left: 245px;
-  min-height: 100vh;
+.sidebar-impact strong {
+  font-size: 14px;
 }
 
-.topbar {
-  height: 70px;
-  border-bottom: 1px solid var(--border);
+.sidebar-impact span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.sidebar-points {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 15px;
-  padding: 0 38px;
-  background: #101713;
+  gap: 8px;
+  margin-top: 5px;
+  padding: 13px 10px;
+  color: var(--muted);
+  font-size: 10px;
+  background: #f7faf7;
+  border-radius: 9px;
 }
 
-.breadcrumb {
-  font-size: 12px;
-  color: #829188;
+.sidebar-points strong {
+  color: var(--green-dark);
+  font-size: 16px;
 }
 
-.breadcrumb strong {
-  color: #dfe9e2;
-  font-weight: 500;
-}
-
-.profile {
+.sidebar-footer {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
+  margin-top: auto;
+  padding: 24px 5px 0;
+  color: var(--muted);
   font-size: 11px;
-  color: #acb9b0;
+  line-height: 1.7;
+}
+
+.footer-leaf {
+  display: grid;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--green);
+  background: var(--green-light);
+  border-radius: 10px;
+}
+
+.sidebar-footer p {
+  margin: 0;
+}
+
+.sidebar-footer strong {
+  color: var(--text);
+}
+
+/* Header */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 9px;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+}
+
+.topbar h1 {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(25px, 2.5vw, 33px);
+  font-weight: 800;
+  letter-spacing: -1.3px;
+  line-height: 1.25;
+}
+
+.topbar-subtitle {
+  margin: 9px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.status-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  color: #34734c;
+  font-size: 11px;
+  font-weight: 600;
+  background: #eaf6ed;
+  border: 1px solid #d7ecdc;
+  border-radius: 30px;
 }
 
 .status-dot {
   width: 7px;
   height: 7px;
-  flex-shrink: 0;
+  background: #2b9b5a;
   border-radius: 50%;
-  background: #43c681;
 }
 
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 31px;
-  height: 31px;
-  border-radius: 50%;
-  margin-left: 9px;
-  background: #254a33;
-  color: #7ce4a5;
-  font-weight: 700;
-}
-
-.mobile-menu {
-  display: none;
-  place-items: center;
-  background: transparent;
-  border: none;
-  color: #dce9df;
-  padding: 5px;
-}
-
-.page-content {
-  max-width: 1400px;
-  padding: 34px 38px 20px;
-  margin: 0 auto;
-}
-
-/* =========================================
-   4. WELCOME SECTION
-========================================= */
-
-.welcome {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  margin-bottom: 27px;
-}
-
-.eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #65d895;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-}
-
-.welcome h1 {
-  font: 800 clamp(27px, 3vw, 36px) 'Manrope', sans-serif;
-  letter-spacing: -1.5px;
-  margin: 10px 0 7px;
-}
-
-.welcome p {
-  color: #96a59b;
-  font-size: 12px;
-  margin: 0;
-  line-height: 1.7;
-}
-
-.date-chip {
-  border: 1px solid #2c4434;
-  border-radius: 7px;
-  padding: 10px 13px;
-  color: #b7c9bc;
-  font-size: 10px;
-  letter-spacing: 0.7px;
-  white-space: nowrap;
-}
-
-.date-chip span {
-  color: #4dd18a;
-  padding: 0 6px;
-}
-
-/* =========================================
-   5. SHARED PANELS
-========================================= */
-
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  min-width: 0;
-}
-
-.panel-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.panel-heading h2,
-.solar-panel h2 {
-  font: 700 17px 'Manrope', sans-serif;
-  letter-spacing: -0.4px;
-  margin: 7px 0 5px;
-}
-
-.panel-heading p {
-  color: #8d9d92;
-  font-size: 11px;
-  margin: 0;
-  line-height: 1.6;
-}
-
-/* =========================================
-   6. CARBON FOOTPRINT CALCULATOR
-========================================= */
-
-.calculator-panel {
-  padding: 22px;
-  margin-bottom: 17px;
-}
-
-.calculator-heading {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-}
-
-.calculator-icon {
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  background: #193a29;
-  color: #55d98c;
-}
-
-.calculator-panel h2 {
-  font: 700 18px 'Manrope', sans-serif;
-  letter-spacing: -0.4px;
-  margin: 8px 0;
-}
-
-.calculator-panel p {
-  color: #96a59b;
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-.calculator-form {
-  display: flex;
-  align-items: end;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-top: 18px;
-}
-
-.calculator-form label {
-  width: 100%;
-  color: #b5c3b9;
-  font-size: 12px;
-}
-
-.calculator-form input {
-  flex: 1;
-  min-width: 160px;
-  min-height: 42px;
-  background: #0d1411;
-  border: 1px solid #34473b;
-  border-radius: 7px;
-  padding: 12px;
-  color: #e7eee9;
-  font: inherit;
-}
-
-.calculator-form input:focus {
-  outline: 2px solid #39b879;
-  outline-offset: 1px;
-}
-
-.calculator-form button {
-  min-height: 42px;
-  background: #46c77d;
-  color: #102319;
-  border: none;
-  border-radius: 7px;
-  padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 700;
-  transition: background 0.2s ease;
-}
-
-.calculator-form button:hover:not(:disabled) {
-  background: #70e09c;
-}
-
-.calculator-form button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-.api-error {
-  color: #ff9b9b !important;
-  font-size: 12px;
-  margin-top: 15px;
-}
-
-.calculation-result {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid #25342b;
-}
-
-.calculation-result > span {
-  color: #a7b6aa;
-  font-size: 12px;
-}
-
-.calculation-result h3 {
-  color: #65d895;
-  font: 800 28px 'Manrope', sans-serif;
-  letter-spacing: -0.7px;
-  margin: 8px 0;
-}
-
-.calculation-result p {
-  margin: 8px 0 15px;
-}
-
-.result-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 15px;
-  margin: 12px 0;
-  font-size: 12px;
-}
-
-.result-details span {
-  color: #96a59b;
-}
-
-.result-details strong {
-  text-align: right;
-  overflow-wrap: anywhere;
-}
-
-.recommendations-title {
-  display: block;
-  margin-top: 20px;
-  font-size: 13px;
-  color: #dfe9e2;
-}
-
-.calculation-result ul {
-  padding-left: 20px;
-  line-height: 1.9;
-  margin-bottom: 0;
-}
-
-.calculation-result li {
-  color: #a7b6aa;
-  font-size: 12px;
-}
-
-/* =========================================
-   7. METRIC CARDS
-========================================= */
+/* Metric cards */
 
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 15px;
-  margin-bottom: 17px;
+  gap: 17px;
+  margin-bottom: 24px;
 }
 
 .metric-card {
-  padding: 18px 17px;
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
   min-width: 0;
-  overflow-wrap: anywhere;
+  min-height: 135px;
+  padding: 21px 17px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgb(31 65 42 / 3%);
 }
 
 .metric-icon {
-  width: 37px;
-  height: 37px;
   display: grid;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
   place-items: center;
-  border-radius: 10px;
-  margin-bottom: 15px;
+  border-radius: 12px;
 }
 
 .metric-icon.green {
-  background: #193a29;
-  color: #55d98c;
+  color: #258451;
+  background: #e7f5eb;
 }
 
-.metric-icon.amber {
-  background: #3c301b;
-  color: #edbd60;
-}
-
-.metric-icon.purple {
-  background: #302444;
-  color: #c59aff;
+.metric-icon.yellow {
+  color: #b98215;
+  background: #fff4d9;
 }
 
 .metric-icon.blue {
-  background: #1e3040;
-  color: #80c9ed;
+  color: #397ac0;
+  background: #eaf2ff;
 }
 
-.metric-label {
-  font-size: 11px;
-  color: #a2b0a6;
+.metric-icon.purple {
+  color: #8661c6;
+  background: #f1ebff;
 }
 
-.metric-value {
-  font: 800 clamp(22px, 2.3vw, 29px) 'Manrope', sans-serif;
-  letter-spacing: -1px;
-  margin: 9px 0;
-  overflow-wrap: anywhere;
-}
-
-.metric-value span {
-  font: 500 11px 'DM Sans', sans-serif;
-  letter-spacing: 0;
-  color: #9aa89f;
-}
-
-.metric-note {
-  font-size: 10px;
-  color: #84948a;
-  line-height: 1.6;
-}
-
-/* =========================================
-   8. ANALYTICS AND SCORE LAYOUT
-========================================= */
-
-.content-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr);
-  gap: 17px;
-  margin-bottom: 17px;
-}
-
-.energy-panel,
-.score-panel,
-.challenges-panel {
-  padding: 22px;
+.metric-content {
   min-width: 0;
 }
 
-.chart-icon {
-  display: grid;
-  place-items: center;
-  width: 37px;
-  height: 37px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  background: #1a3525;
-  color: #51d78a;
+.metric-label {
+  margin: 2px 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
-.chart-legend {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 27px;
-  color: #b5c3b9;
+.metric-value {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+
+.metric-unit {
+  color: #758279;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.metric-note {
+  margin: 8px 0 0;
+  color: #8a958d;
   font-size: 10px;
+  line-height: 1.5;
 }
 
-.chart-legend > span:first-child {
+/* Shared panels */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: start;
+  gap: 22px;
+  margin-bottom: 24px;
+}
+
+.panel {
+  min-width: 0;
+  padding: 25px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgb(31 65 42 / 3%);
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+.section-header h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.4px;
+  line-height: 1.4;
+}
+
+.section-header p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.section-header-icon {
+  display: grid;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  color: var(--green);
+  background: var(--green-light);
+  border-radius: 11px;
+}
+
+/* Footprint calculator */
+
+.calculator-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calculator-form label {
+  color: #435349;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.input-with-unit {
   display: flex;
   align-items: center;
-  gap: 8px;
+  min-width: 0;
+  border: 1px solid #dce6dd;
+  border-radius: 10px;
+  background: #fbfdfb;
+  transition: border-color 150ms ease;
 }
 
-.chart-legend i {
-  width: 8px;
-  height: 8px;
+.input-with-unit:focus-within {
+  border-color: #64b984;
+}
+
+.input-with-unit input {
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  padding: 0 13px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.input-with-unit input:focus-visible {
+  outline: none;
+}
+
+.input-with-unit span {
   flex-shrink: 0;
-  border-radius: 50%;
-  background: #39b879;
-}
-
-.chart-period {
-  color: #829288;
-  letter-spacing: 1px;
-  font-size: 9px;
+  padding: 0 13px;
+  color: var(--muted);
+  font-size: 11px;
   white-space: nowrap;
 }
 
+.calculator-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 3px 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.calculator-hint svg {
+  flex-shrink: 0;
+  color: #bd8a24;
+}
+
+.calculator-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 43px;
+  border: none;
+  border-radius: 9px;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.primary-button {
+  padding: 0 17px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--green);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: var(--green-dark);
+  transform: translateY(-1px);
+}
+
+.primary-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.secondary-button {
+  width: 43px;
+  color: #536258;
+  background: #f0f5f0;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #e3ece4;
+}
+
+.secondary-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Calculation result */
+
+.calculation-result {
+  margin-top: 24px;
+  padding: 19px;
+  background: #f4faf5;
+  border: 1px solid #dcefe0;
+  border-radius: 12px;
+}
+
+.result-topline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #267747;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.result-number {
+  margin-top: 14px;
+  color: #1f7544;
+  font-size: clamp(25px, 3vw, 33px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+
+.result-number span {
+  display: block;
+  margin-top: 4px;
+  color: #718378;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.result-detail,
+.result-factor,
+.result-disclaimer {
+  color: #758279;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.result-detail {
+  margin: 12px 0 5px;
+}
+
+.result-factor {
+  margin: 5px 0;
+}
+
+.result-disclaimer {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid #dcefe0;
+}
+
+.recommendations {
+  margin-top: 20px;
+  padding-top: 17px;
+  border-top: 1px solid #dcefe0;
+}
+
+.recommendations h3 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.recommendations ul {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recommendations li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: #536258;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.recommendations li svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--green);
+}
+
+.error-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 17px;
+  padding: 13px;
+  color: #a63838;
+  font-size: 12px;
+  line-height: 1.6;
+  background: #fff1f0;
+  border: 1px solid #f4d2d0;
+  border-radius: 9px;
+}
+
+.error-message svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Weekly energy chart */
+
+.chart-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-summary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 2px 0 12px;
+}
+
+.chart-summary-label,
+.chart-summary strong {
+  display: block;
+}
+
+.chart-summary-label {
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.chart-summary strong {
+  color: var(--text);
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.chart-badge {
+  padding: 6px 9px;
+  color: #7c6b37;
+  font-size: 10px;
+  font-weight: 600;
+  background: #fff6dc;
+  border-radius: 20px;
+}
+
 .chart-container {
-  height: 200px;
   width: 100%;
-  margin-top: 13px;
+  height: 235px;
+  min-height: 235px;
+  margin-top: 5px;
 }
 
 .chart-footnote {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--muted);
   font-size: 10px;
-  color: #829288;
-  margin-top: 5px;
+  line-height: 1.6;
 }
 
-.chart-footnote span {
-  width: 6px;
-  height: 6px;
+.chart-legend-dot {
+  width: 8px;
+  height: 8px;
   flex-shrink: 0;
+  background: #28a66a;
   border-radius: 50%;
-  background: #e5b957;
 }
 
-/* =========================================
-   9. GREEN IMPACT SCORE
-========================================= */
+/* Green challenges */
 
-.score-circle {
-  width: 142px;
-  height: 142px;
-  border-radius: 50%;
-  border: 8px solid #254734;
-  border-top-color: #4fd18a;
-  border-right-color: #4fd18a;
-  display: grid;
-  place-items: center;
-  margin: 24px auto 15px;
-  transform: rotate(-35deg);
+.challenges-panel {
+  margin-bottom: 24px;
 }
 
-.score-circle > div {
-  transform: rotate(35deg);
-  display: grid;
-  text-align: center;
-  gap: 4px;
+.challenge-progress {
+  margin-bottom: 19px;
+  padding: 15px;
+  background: #f7faf7;
+  border-radius: 10px;
 }
 
-.score-circle strong {
-  font: 800 36px 'Manrope', sans-serif;
-}
-
-.score-circle span {
-  font-size: 9px;
-  color: #91a397;
-  letter-spacing: 1px;
-}
-
-.score-status {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  color: #70d99a;
-  font-size: 10px;
-  text-align: center;
-}
-
-.score-divider {
-  border-top: 1px solid var(--border);
-  margin: 20px 0 15px;
-}
-
-.score-row {
+.challenge-progress-copy {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  color: #9caea2;
-  font-size: 10px;
-  margin: 12px 0;
+  gap: 12px;
+  margin-bottom: 11px;
 }
 
-.score-row strong {
-  color: #e1ece4;
+.challenge-progress-copy span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.challenge-progress-copy strong {
+  color: var(--green-dark);
+  font-size: 11px;
 }
 
 .progress-track {
-  height: 5px;
-  border-radius: 10px;
-  background: #26372b;
+  height: 7px;
   overflow: hidden;
+  background: #e4ece5;
+  border-radius: 10px;
 }
 
-.progress-track > div {
+.progress-fill {
   height: 100%;
-  background: #43c681;
+  background: #2a9a5c;
   border-radius: inherit;
-  transition: width 0.25s ease;
+  transition: width 200ms ease;
 }
 
-/* =========================================
-   10. CHALLENGES AND SOLAR SECTION
-========================================= */
-
-.bottom-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
-  gap: 17px;
+.challenges-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.count-badge {
-  background: #1c3224;
-  color: #75d99a;
-  border-radius: 5px;
-  padding: 7px 9px;
-  font-size: 9px;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.challenge-list {
-  margin-top: 17px;
-}
-
-.challenge-row {
+.challenge-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px 0;
-  border-top: 1px solid #253229;
+  gap: 14px;
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
+}
+
+.challenge-card.completed {
+  background: #f5fbf6;
+  border-color: #cce8d2;
 }
 
 .challenge-check {
-  flex-shrink: 0;
   display: grid;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
   place-items: center;
-  width: 23px;
-  height: 23px;
-  border: 1px solid #4b6653;
-  border-radius: 7px;
-  color: #4fd18a;
+  color: #9aa79d;
   background: transparent;
-  transition: background 0.2s ease;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .challenge-check:hover {
-  background: #1b3827;
+  color: var(--green);
 }
 
-.challenge-done .challenge-check {
-  background: #1b4b2d;
-  border-color: #43bd77;
+.challenge-card.completed .challenge-check {
+  color: var(--green);
 }
 
-.challenge-text {
-  min-width: 0;
+.challenge-details {
   flex: 1;
+  min-width: 0;
 }
 
-.challenge-text strong {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.5;
+.challenge-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.challenge-text span {
-  display: block;
-  color: #829288;
-  font-size: 10px;
-  margin-top: 4px;
-}
-
-.challenge-done .challenge-text strong {
-  color: #8fa497;
-  text-decoration: line-through;
-}
-
-.points {
-  color: #68d999;
-  font-size: 11px;
+.challenge-details h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 12px;
   font-weight: 700;
-  white-space: nowrap;
+  line-height: 1.6;
 }
 
-.points span {
+.challenge-card.completed .challenge-details h3 {
+  color: var(--green-dark);
+}
+
+.challenge-category {
+  padding: 4px 7px;
+  color: #597561;
   font-size: 9px;
-  color: #8c9e92;
-  font-weight: 400;
+  font-weight: 600;
+  background: #edf5ee;
+  border-radius: 5px;
 }
 
-/* Solar panel */
+.challenge-details p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
 
-.solar-panel {
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(140deg, #193c28, #14251a 75%);
-  border-color: #2d4d35;
+.challenge-points {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.challenge-points strong {
+  color: var(--green-dark);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.challenge-points span {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.challenge-disclaimer {
+  margin: 17px 0 0;
+  color: #8a958d;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* Solar banner */
+
+.solar-banner {
+  display: flex;
+  align-items: center;
+  gap: 19px;
+  margin-bottom: 25px;
+  padding: 25px;
+  background: linear-gradient(115deg, #e9f6eb 0%, #f5faf1 100%);
+  border: 1px solid #dceede;
+  border-radius: 16px;
 }
 
 .solar-icon {
   display: grid;
+  flex-shrink: 0;
+  width: 55px;
+  height: 55px;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: #29492c;
-  color: #f2ce71;
-  margin-bottom: 22px;
+  color: #9b7118;
+  background: #fff3d3;
+  border-radius: 15px;
 }
 
-.solar-panel h2 {
-  font-size: 20px;
-  margin-top: 10px;
-  max-width: 230px;
+.solar-content {
+  flex: 1;
+  min-width: 0;
 }
 
-.solar-panel > p {
-  color: #a6b9aa;
+.solar-content .eyebrow {
+  margin-bottom: 7px;
+  font-size: 9px;
+}
+
+.solar-content h2 {
+  margin: 0;
+  color: #264533;
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.4px;
+  line-height: 1.5;
+}
+
+.solar-content > p:last-child {
+  margin: 7px 0 0;
+  color: #6c7e70;
   font-size: 11px;
-  line-height: 1.9;
-  max-width: 290px;
-  position: relative;
-  z-index: 1;
+  line-height: 1.7;
 }
 
-.solar-button {
-  display: flex;
+.solar-action {
+  display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
-  gap: 9px;
-  background: #46c77d;
-  color: #102319;
-  border: none;
-  border-radius: 7px;
+  gap: 8px;
   padding: 11px 13px;
+  color: #ffffff;
   font-size: 11px;
-  font-weight: 700;
-  margin-top: 19px;
-  position: relative;
-  z-index: 1;
-  transition: background 0.2s ease;
+  font-weight: 600;
+  background: var(--green);
+  border-radius: 8px;
+  transition: background 150ms ease;
 }
 
-.solar-button:hover {
-  background: #70e09c;
+.solar-action:hover {
+  background: var(--green-dark);
 }
 
-.solar-decoration {
-  position: absolute;
-  right: -13px;
-  bottom: -13px;
-  color: #a6d4a8;
-  opacity: 0.08;
-  transform: rotate(-15deg);
-  pointer-events: none;
-}
+/* Footer */
 
-/* =========================================
-   11. FOOTER
-========================================= */
-
-.page-footer {
+.dashboard-footer {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 24px;
-  border-top: 1px solid var(--border);
-  padding-top: 17px;
-  color: #75867a;
+  gap: 15px;
+  padding: 18px 0 0;
+  color: #8a958d;
   font-size: 10px;
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
 }
 
-.page-footer span:first-child {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: #8eab96;
-}
+/* Responsive layouts */
 
-/* =========================================
-   12. TABLET RESPONSIVENESS
-========================================= */
-
-@media (min-width: 1500px) {
-  .page-content {
-    padding-top: 40px;
-  }
-
-  .chart-container {
-    height: 230px;
-  }
-}
-
-@media (max-width: 1150px) {
-  .sidebar {
-    width: 215px;
-  }
-
+@media (max-width: 1250px) {
   .main-content {
-    margin-left: 215px;
-  }
-
-  .page-content {
-    padding: 27px 22px 20px;
-  }
-
-  .topbar {
-    padding: 0 22px;
+    padding: 28px 24px;
   }
 
   .metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .content-grid {
-    grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr);
-  }
-
-  .bottom-grid {
-    grid-template-columns: minmax(0, 1.3fr) minmax(230px, 1fr);
-  }
-}
-
-/* =========================================
-   13. MOBILE RESPONSIVENESS
-========================================= */
-
-@media (max-width: 800px) {
-  .sidebar {
-    width: 245px;
-    transform: translateX(-100%);
-    transition: transform 0.2s ease;
-    box-shadow: none;
-  }
-
-  .sidebar.sidebar-open {
-    transform: translateX(0);
-    box-shadow: 15px 0 45px #0008;
-  }
-
-  .main-content {
-    margin-left: 0;
-  }
-
-  .mobile-menu {
-    display: grid;
-  }
-
-  .topbar {
-    gap: 12px;
-    height: 60px;
-    padding: 0 16px;
-  }
-
-  .breadcrumb {
-    margin-right: auto;
-  }
-
-  .profile > span:not(.status-dot) {
-    display: none;
-  }
-
-  .page-content {
-    padding: 26px 16px;
-  }
-
-  .content-grid,
-  .bottom-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .welcome {
-    align-items: flex-start;
-  }
-
-  .date-chip {
-    display: none;
-  }
-
-  .solar-panel h2 {
-    max-width: 100%;
-  }
-}
-
-/* =========================================
-   14. SMALL MOBILE SCREENS
-========================================= */
-
-@media (max-width: 460px) {
-  .metrics-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .metric-card {
-    padding: 13px 11px;
+    min-height: 125px;
   }
+}
 
-  .metric-label {
-    font-size: 10px;
-  }
-
-  .metric-note {
-    font-size: 9px;
-  }
-
-  .metric-value {
-    font-size: 22px;
-  }
-
-  .energy-panel,
-  .score-panel,
-  .challenges-panel {
+@media (max-width: 760px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
     padding: 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
 
-  .calculator-panel {
-    padding: 16px;
+  .brand {
+    margin-bottom: 17px;
   }
 
-  .calculator-panel h2 {
-    font-size: 16px;
+  .sidebar-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
   }
 
-  .panel-heading h2 {
-    font-size: 15px;
+  .nav-heading {
+    grid-column: 1 / -1;
+    margin-top: 8px;
   }
 
-  .chart-container {
-    height: 180px;
+  .nav-heading-spaced {
+    margin-top: 13px;
   }
 
-  .page-footer {
-    flex-direction: column;
+  .sidebar-impact,
+  .sidebar-points,
+  .sidebar-footer {
+    grid-column: 1 / -1;
+  }
+
+  .sidebar-footer {
+    margin-top: 8px;
+    padding-top: 10px;
+  }
+
+  .main-content {
+    width: 100%;
+    margin-left: 0;
+    padding: 25px 16px;
+  }
+
+  .topbar {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
   }
 
-  .welcome h1 {
+  .topbar h1 {
     font-size: 27px;
   }
 
-  .welcome p {
-    max-width: 290px;
+  .status-pill {
+    font-size: 10px;
   }
 
-  .calculator-form {
-    align-items: stretch;
+  .metrics-grid {
+    gap: 11px;
+  }
+
+  .metric-card {
     flex-direction: column;
+    gap: 10px;
+    padding: 15px;
   }
 
-  .calculator-form input,
-  .calculator-form button {
-    width: 100%;
+  .metric-label {
+    min-height: 32px;
+    margin-bottom: 8px;
   }
 
-  .calculator-heading {
+  .panel {
+    padding: 19px;
+  }
+
+  .dashboard-grid {
+    gap: 16px;
+  }
+
+  .solar-banner {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 20px;
+  }
+
+  .solar-content {
+    flex-basis: calc(100% - 75px);
+  }
+
+  .solar-action {
+    margin-left: 74px;
+  }
+
+  .dashboard-footer {
+    flex-direction: column;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 420px) {
+  .metrics-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .metric-card {
+    flex-direction: row;
     align-items: flex-start;
   }
 
-  .result-details {
-    flex-direction: column;
-    gap: 4px;
+  .metric-label {
+    min-height: 0;
   }
 
-  .count-badge {
-    font-size: 8px;
-    padding: 6px 7px;
+  .panel {
+    padding: 16px;
   }
 
-  .challenge-row {
+  .input-with-unit span {
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  .primary-button {
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
+  .challenge-card {
+    align-items: flex-start;
     gap: 9px;
+    padding: 12px;
+  }
+
+  .challenge-points strong {
+    font-size: 15px;
+  }
+
+  .challenge-progress-copy {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
   }
 }

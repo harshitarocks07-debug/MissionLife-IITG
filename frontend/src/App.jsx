@@ -2,18 +2,20 @@
 import { useState } from "react";
 import {
   Leaf,
-  LayoutDashboard,
   Zap,
-  Sun,
-  Trophy,
-  Target,
   TrendingDown,
-  TreePine,
-  Menu,
-  ArrowUpRight,
+  Trophy,
+  Sun,
+  ArrowRight,
   CheckCircle2,
-  Calculator,
+  Circle,
+  Activity,
+  Target,
   Lightbulb,
+  LoaderCircle,
+  AlertCircle,
+  Calculator,
+  RefreshCw,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -21,558 +23,623 @@ import {
   Area,
   XAxis,
   YAxis,
-  Tooltip,
   CartesianGrid,
+  Tooltip,
 } from "recharts";
 import { calculateFootprint } from "./api";
 import "./App.css";
 
+// Sample chart data. Historical tracking is not connected yet.
 const weeklyData = [
-  { day: "Mon", usage: 12 },
-  { day: "Tue", usage: 10 },
-  { day: "Wed", usage: 11 },
-  { day: "Thu", usage: 8 },
-  { day: "Fri", usage: 9 },
-  { day: "Sat", usage: 6 },
-  { day: "Sun", usage: 7 },
+  { day: "Mon", energy: 6.2 },
+  { day: "Tue", energy: 5.8 },
+  { day: "Wed", energy: 7.1 },
+  { day: "Thu", energy: 5.4 },
+  { day: "Fri", energy: 6.5 },
+  { day: "Sat", energy: 4.9 },
+  { day: "Sun", energy: 5.2 },
 ];
 
 const initialChallenges = [
   {
     id: 1,
-    title: "Switch off unused appliances",
+    title: "Switch off unused lights",
+    description: "Save electricity by switching off lights when leaving a room.",
     points: 20,
-    done: false,
+    category: "Energy",
   },
   {
     id: 2,
-    title: "Use a reusable water bottle",
-    points: 10,
-    done: false,
+    title: "Use natural daylight",
+    description: "Open curtains and reduce unnecessary daytime lighting.",
+    points: 25,
+    category: "Energy",
   },
   {
     id: 3,
-    title: "Reduce unnecessary lighting",
-    points: 15,
-    done: false,
+    title: "Reduce single-use plastic",
+    description: "Carry a reusable bottle or bag instead of single-use plastic.",
+    points: 30,
+    category: "Waste",
   },
 ];
 
-export default function App() {
-  const [active, setActive] = useState("Overview");
-  const [challenges, setChallenges] = useState(initialChallenges);
-  const [menuOpen, setMenuOpen] = useState(false);
+function Metric({
+  icon: Icon,
+  label,
+  value,
+  unit,
+  note,
+  color = "green",
+}) {
+  return (
+    <div className="metric-card">
+      <div className={`metric-icon ${color}`}>
+        <Icon size={22} />
+      </div>
 
+      <div className="metric-content">
+        <p className="metric-label">{label}</p>
+        <h2 className="metric-value">
+          {value}
+          {unit && <span className="metric-unit"> {unit}</span>}
+        </h2>
+        <p className="metric-note">{note}</p>
+      </div>
+    </div>
+  );
+}
+
+function SectionHeader({ title, subtitle, icon: Icon }) {
+  return (
+    <div className="section-header">
+      <div>
+        <h2>{title}</h2>
+        {subtitle && <p>{subtitle}</p>}
+      </div>
+      {Icon && (
+        <div className="section-header-icon">
+          <Icon size={21} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function App() {
   const [electricity, setElectricity] = useState("186");
   const [footprintResult, setFootprintResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState("");
+  const [error, setError] = useState("");
+  const [completedChallenges, setCompletedChallenges] = useState([]);
 
-  const completed = challenges.filter((item) => item.done).length;
+  const completedPoints = initialChallenges.reduce((total, challenge) => {
+    return completedChallenges.includes(challenge.id)
+      ? total + challenge.points
+      : total;
+  }, 0);
 
-  const points = challenges.reduce(
-    (sum, challenge) =>
-      sum + (challenge.done ? challenge.points : 0),
-    120
-  );
-
-  const navigation = [
-    { name: "Overview", icon: LayoutDashboard },
-    { name: "Energy Tracker", icon: Zap },
-    { name: "Solar Insights", icon: Sun },
-    { name: "Green Challenges", icon: Trophy },
-  ];
-
-  function toggleChallenge(id) {
-    setChallenges((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, done: !item.done } : item
-      )
-    );
-  }
+  const completedCount = completedChallenges.length;
 
   async function handleCalculate(event) {
     event.preventDefault();
+    setError("");
 
     const value = Number(electricity);
 
     if (!Number.isFinite(value) || value <= 0 || value > 100000) {
-      setApiError("Enter monthly electricity usage between 0 and 100000 kWh.");
+      setError("Enter an electricity usage value greater than 0 and no more than 100,000 kWh.");
+      setFootprintResult(null);
       return;
     }
 
     setLoading(true);
-    setApiError("");
 
     try {
       const result = await calculateFootprint(value);
       setFootprintResult(result);
-    } catch (error) {
-      setApiError(
-        error.message ||
-          "Unable to calculate emissions. Check that the backend is running."
+    } catch (err) {
+      setError(
+        err.message ||
+          "Unable to connect to the backend. Check that your FastAPI server is running."
       );
+      setFootprintResult(null);
     } finally {
       setLoading(false);
     }
   }
 
-  const displayedFootprint = footprintResult
+  function toggleChallenge(challengeId) {
+    setCompletedChallenges((previous) =>
+      previous.includes(challengeId)
+        ? previous.filter((id) => id !== challengeId)
+        : [...previous, challengeId]
+    );
+  }
+
+  function resetCalculator() {
+    setElectricity("186");
+    setFootprintResult(null);
+    setError("");
+  }
+
+  const emissions = footprintResult
     ? footprintResult.estimated_monthly_emissions_kg_co2
+    : null;
+
+  const calculatedElectricity = footprintResult
+    ? footprintResult.monthly_electricity_kwh
     : null;
 
   return (
     <div className="app-shell">
-      <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`}>
+      {/* Sidebar */}
+      <aside className="sidebar">
         <div className="brand">
           <div className="brand-icon">
-            <Leaf size={23} />
+            <Leaf size={25} />
           </div>
           <div>
-            <h2>MissionLiFE</h2>
-            <span>IMPACT PLATFORM</span>
+            <h1>MissionLiFE</h1>
+            <span>IMPACT DASHBOARD</span>
           </div>
         </div>
 
-        <div className="nav-label">WORKSPACE</div>
+        <nav className="sidebar-nav">
+          <p className="nav-heading">WORKSPACE</p>
 
-        <nav>
-          {navigation.map(({ name, icon: Icon }) => (
-            <button
-              key={name}
-              className={`nav-item ${active === name ? "selected" : ""}`}
-              onClick={() => {
-                setActive(name);
-                setMenuOpen(false);
-              }}
-            >
-              <Icon size={19} />
-              <span>{name}</span>
-            </button>
-          ))}
+          <a href="#overview" className="nav-link active">
+            <Activity size={19} />
+            <span>Overview</span>
+          </a>
+
+          <a href="#footprint" className="nav-link">
+            <Leaf size={19} />
+            <span>Carbon Footprint</span>
+          </a>
+
+          <a href="#energy" className="nav-link">
+            <Zap size={19} />
+            <span>Energy Tracker</span>
+          </a>
+
+          <a href="#challenges" className="nav-link">
+            <Trophy size={19} />
+            <span>Green Challenges</span>
+          </a>
+
+          <p className="nav-heading nav-heading-spaced">YOUR IMPACT</p>
+
+          <div className="sidebar-impact">
+            <div className="sidebar-impact-icon">
+              <Target size={20} />
+            </div>
+            <div>
+              <strong>{completedCount} / {initialChallenges.length}</strong>
+              <span>Challenges completed</span>
+            </div>
+          </div>
+
+          <div className="sidebar-points">
+            <span>Points earned this session</span>
+            <strong>{completedPoints}</strong>
+          </div>
         </nav>
 
-        <div className="sidebar-bottom">
-          <div className="eco-card">
-            <TreePine size={25} />
-            <h3>Small actions.</h3>
-            <h3>Lasting impact.</h3>
-            <p>Every sustainable choice moves us forward.</p>
+        <div className="sidebar-footer">
+          <div className="footer-leaf">
+            <Leaf size={18} />
           </div>
-          <span className="sidebar-footer">HACKCULT '26 · GEDA</span>
+          <p>
+            Small actions.
+            <br />
+            <strong>Meaningful impact.</strong>
+          </p>
         </div>
       </aside>
 
-      <main className="main-content">
+      {/* Main dashboard */}
+      <main className="main-content" id="overview">
         <header className="topbar">
-          <button
-            className="mobile-menu"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle navigation"
-          >
-            <Menu size={22} />
-          </button>
-
-          <div className="breadcrumb">
-            Workspace / <strong>{active}</strong>
+          <div>
+            <p className="eyebrow">SUSTAINABILITY WORKSPACE</p>
+            <h1>Your environmental impact</h1>
+            <p className="topbar-subtitle">
+              Track your energy usage and build greener daily habits.
+            </p>
           </div>
 
-          <div className="profile">
+          <div className="status-pill">
             <span className="status-dot" />
-            <span>Citizen Dashboard</span>
-            <div className="avatar">C</div>
+            API-connected calculator
           </div>
         </header>
 
-        <div className="page-content">
-          <section className="welcome">
-            <div>
-              <div className="eyebrow">
-                <Leaf size={14} /> LIVE SUSTAINABLY
-              </div>
-              <h1>Your actions matter.</h1>
-              <p>
-                Track your impact, build greener habits, and make every day count.
-              </p>
-            </div>
+        {/* Metric cards */}
+        <section className="metrics-grid" aria-label="Impact metrics">
+          <Metric
+            icon={Leaf}
+            label="Monthly carbon emissions"
+            value={emissions !== null ? emissions.toLocaleString("en-IN") : "—"}
+            unit="kg CO₂"
+            note={
+              emissions !== null
+                ? "Calculated by the backend"
+                : "Calculate your footprint below"
+            }
+            color="green"
+          />
 
-            <div className="date-chip">
-              MISSION LiFE <span>●</span> 2026
-            </div>
-          </section>
+          <Metric
+            icon={Zap}
+            label="Monthly electricity"
+            value={
+              calculatedElectricity !== null
+                ? calculatedElectricity.toLocaleString("en-IN")
+                : "—"
+            }
+            unit="kWh"
+            note={
+              calculatedElectricity !== null
+                ? "Your submitted monthly usage"
+                : "Enter your usage to get started"
+            }
+            color="yellow"
+          />
 
-          <section className="panel calculator-panel">
-            <div className="calculator-heading">
-              <div className="calculator-icon">
-                <Calculator size={20} />
-              </div>
-              <div>
-                <span className="section-kicker">
-                  PERSONALISED FOOTPRINT
-                </span>
-                <h2>Calculate your electricity emissions</h2>
-                <p>
-                  Enter your household's monthly electricity consumption.
-                </p>
-              </div>
-            </div>
+          <Metric
+            icon={TrendingDown}
+            label="Footprint reduction"
+            value="—"
+            unit=""
+            note="Available after historical tracking"
+            color="blue"
+          />
 
-            <form
-              className="calculator-form"
-              onSubmit={handleCalculate}
-            >
+          <Metric
+            icon={Trophy}
+            label="Green challenge points"
+            value={completedPoints.toString()}
+            unit="pts"
+            note={`${completedCount} challenge${completedCount === 1 ? "" : "s"} completed this session`}
+            color="purple"
+          />
+        </section>
+
+        {/* Footprint calculator and chart */}
+        <section className="dashboard-grid">
+          <div className="panel calculator-panel" id="footprint">
+            <SectionHeader
+              title="Carbon footprint calculator"
+              subtitle="Estimate emissions from your monthly electricity consumption."
+              icon={Calculator}
+            />
+
+            <form className="calculator-form" onSubmit={handleCalculate}>
               <label htmlFor="electricity">
-                Monthly electricity usage (kWh)
+                Monthly electricity consumption
               </label>
 
-              <input
-                id="electricity"
-                type="number"
-                min="0.01"
-                max="100000"
-                step="any"
-                value={electricity}
-                onChange={(event) =>
-                  setElectricity(event.target.value)
-                }
-                required
-              />
+              <div className="input-with-unit">
+                <input
+                  id="electricity"
+                  type="number"
+                  min="0.01"
+                  max="100000"
+                  step="any"
+                  value={electricity}
+                  onChange={(event) => setElectricity(event.target.value)}
+                  placeholder="e.g. 186"
+                  required
+                />
+                <span>kWh / month</span>
+              </div>
 
-              <button type="submit" disabled={loading}>
-                {loading ? "Calculating..." : "Calculate footprint"}
-              </button>
+              <div className="calculator-hint">
+                <Lightbulb size={16} />
+                Find your monthly usage on your electricity bill.
+              </div>
+
+              <div className="calculator-actions">
+                <button
+                  type="submit"
+                  className="primary-button"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <LoaderCircle className="spin" size={18} />
+                      Calculating...
+                    </>
+                  ) : (
+                    <>
+                      Calculate footprint
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={resetCalculator}
+                  disabled={loading}
+                  aria-label="Reset calculator"
+                >
+                  <RefreshCw size={17} />
+                </button>
+              </div>
             </form>
 
-            {apiError && (
-              <p className="api-error" role="alert">
-                {apiError}
-              </p>
+            {error && (
+              <div className="error-message" role="alert">
+                <AlertCircle size={18} />
+                <span>{error}</span>
+              </div>
             )}
 
             {footprintResult && (
               <div className="calculation-result" aria-live="polite">
-                <span>Estimated monthly emissions</span>
-
-                <h3>{displayedFootprint} kg CO₂</h3>
-
-                <p>{footprintResult.note}</p>
-
-                <div className="result-details">
-                  <span>Electricity usage</span>
-                  <strong>
-                    {footprintResult.monthly_electricity_kwh} kWh
-                  </strong>
+                <div className="result-topline">
+                  <CheckCircle2 size={19} />
+                  <span>Calculation complete</span>
                 </div>
 
-                <div className="result-details">
-                  <span>Emission factor used</span>
-                  <strong>
-                    {footprintResult.emission_factor_kg_co2_per_kwh} kg CO₂/kWh
-                  </strong>
+                <div className="result-number">
+                  {footprintResult.estimated_monthly_emissions_kg_co2.toLocaleString(
+                    "en-IN"
+                  )}
+                  <span> kg CO₂ / month</span>
                 </div>
 
-                <strong className="recommendations-title">
-                  Recommendations
-                </strong>
+                <p className="result-detail">
+                  Based on {footprintResult.monthly_electricity_kwh} kWh of
+                  monthly electricity usage.
+                </p>
 
-                <ul>
-                  {footprintResult.recommendations.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
+                <p className="result-factor">
+                  Emission factor used:{" "}
+                  {footprintResult.emission_factor_kg_co2_per_kwh} kg CO₂/kWh
+                </p>
+
+                {footprintResult.note && (
+                  <p className="result-disclaimer">{footprintResult.note}</p>
+                )}
+
+                {Array.isArray(footprintResult.recommendations) &&
+                  footprintResult.recommendations.length > 0 && (
+                    <div className="recommendations">
+                      <h3>Recommended actions</h3>
+                      <ul>
+                        {footprintResult.recommendations.map(
+                          (recommendation, index) => (
+                            <li key={`${index}-${recommendation}`}>
+                              <CheckCircle2 size={16} />
+                              <span>{recommendation}</span>
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    </div>
+                  )}
               </div>
             )}
-          </section>
+          </div>
 
-          <section className="metrics-grid">
-            <Metric
-              icon={Leaf}
-              label="Carbon footprint"
-              value={displayedFootprint ?? 124}
-              unit="kg CO₂"
-              note={
-                footprintResult
-                  ? "Calculated from your latest electricity input"
-                  : "Illustrative monthly estimate"
-              }
-              color="green"
-            />
-
-            <Metric
+          <div className="panel chart-panel" id="energy">
+            <SectionHeader
+              title="Weekly energy overview"
+              subtitle="Sample data — historical tracking not connected yet."
               icon={Zap}
-              label="Energy consumption"
-              value={footprintResult?.monthly_electricity_kwh ?? 186}
-              unit="kWh"
-              note={
-                footprintResult
-                  ? "Latest calculated electricity usage"
-                  : "Illustrative monthly usage"
-              }
-              color="amber"
             />
 
-            <Metric
-              icon={Trophy}
-              label="Green points"
-              value={points}
-              unit="PTS"
-              note="Complete challenges to earn more"
-              color="purple"
-            />
-
-            <Metric
-              icon={TrendingDown}
-              label="Footprint reduction"
-              value="12%"
-              unit=""
-              note="Illustrative progress indicator"
-              color="blue"
-            />
-          </section>
-
-          <section className="content-grid">
-            <div className="panel energy-panel">
-              <div className="panel-heading">
-                <div>
-                  <span className="section-kicker">
-                    ENERGY ANALYTICS
-                  </span>
-                  <h2>Weekly energy overview</h2>
-                  <p>Illustrative daily energy consumption</p>
-                </div>
-
-                <div className="chart-icon">
-                  <Zap size={20} />
-                </div>
-              </div>
-
-              <div className="chart-legend">
-                <span>
-                  <i /> Energy usage (kWh)
+            <div className="chart-summary">
+              <div>
+                <span className="chart-summary-label">
+                  Average daily usage
                 </span>
-                <span className="chart-period">LAST 7 DAYS</span>
+                <strong>5.9 kWh</strong>
               </div>
-
-              <div className="chart-container">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart
-                    data={weeklyData}
-                    margin={{
-                      top: 10,
-                      right: 8,
-                      left: -20,
-                      bottom: 0,
-                    }}
-                  >
-                    <defs>
-                      <linearGradient
-                        id="energyFill"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#39b879"
-                          stopOpacity={0.25}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#39b879"
-                          stopOpacity={0.01}
-                        />
-                      </linearGradient>
-                    </defs>
-
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#26332e"
-                      vertical={false}
-                    />
-
-                    <XAxis
-                      dataKey="day"
-                      stroke="#84928a"
-                      axisLine={false}
-                      tickLine={false}
-                    />
-
-                    <YAxis
-                      stroke="#84928a"
-                      axisLine={false}
-                      tickLine={false}
-                    />
-
-                    <Tooltip
-                      contentStyle={{
-                        background: "#18221d",
-                        border: "1px solid #34473b",
-                        borderRadius: 10,
-                      }}
-                    />
-
-                    <Area
-                      type="monotone"
-                      dataKey="usage"
-                      name="Energy usage"
-                      stroke="#39b879"
-                      strokeWidth={3}
-                      fill="url(#energyFill)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div className="chart-footnote">
-                <span />
-                Sample data — replace with measured usage
-              </div>
+              <span className="chart-badge">Sample data</span>
             </div>
 
-            <div className="panel score-panel">
-              <div className="panel-heading">
-                <div>
-                  <span className="section-kicker">YOUR PROGRESS</span>
-                  <h2>Green impact score</h2>
-                  <p>A simple challenge-based score</p>
-                </div>
-                <Target size={21} color="#39b879" />
-              </div>
-
-              <div className="score-circle">
-                <div>
-                  <strong>{Math.min(100, 64 + completed * 5)}</strong>
-                  <span>OUT OF 100</span>
-                </div>
-              </div>
-
-              <div className="score-status">
-                <CheckCircle2 size={16} />
-                Keep building greener habits
-              </div>
-
-              <div className="score-divider" />
-
-              <div className="score-row">
-                <span>Challenges completed</span>
-                <strong>{completed}/3</strong>
-              </div>
-
-              <div className="progress-track">
-                <div
-                  style={{ width: `${(completed / 3) * 100}%` }}
-                />
-              </div>
-
-              <div className="score-row">
-                <span>Green points</span>
-                <strong>{points}</strong>
-              </div>
-            </div>
-          </section>
-
-          <section className="bottom-grid">
-            <div className="panel challenges-panel">
-              <div className="panel-heading">
-                <div>
-                  <span className="section-kicker">TAKE ACTION</span>
-                  <h2>Green challenges</h2>
-                  <p>Small steps that make a difference</p>
-                </div>
-
-                <span className="count-badge">
-                  {completed}/3 DONE
-                </span>
-              </div>
-
-              <div className="challenge-list">
-                {challenges.map((challenge) => (
-                  <div
-                    className={`challenge-row ${
-                      challenge.done ? "challenge-done" : ""
-                    }`}
-                    key={challenge.id}
-                  >
-                    <button
-                      className="challenge-check"
-                      onClick={() => toggleChallenge(challenge.id)}
-                      aria-label={`Toggle ${challenge.title}`}
+            <div className="chart-container">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={weeklyData}
+                  margin={{ top: 12, right: 8, left: -18, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="energyGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
                     >
-                      {challenge.done && <CheckCircle2 size={19} />}
-                    </button>
+                      <stop
+                        offset="0%"
+                        stopColor="#28a66a"
+                        stopOpacity={0.25}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="#28a66a"
+                        stopOpacity={0.02}
+                      />
+                    </linearGradient>
+                  </defs>
 
-                    <div className="challenge-text">
-                      <strong>{challenge.title}</strong>
-                      <span>
-                        {challenge.done
-                          ? "Completed — great work!"
-                          : "Daily sustainability action"}
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e9eee9"
+                  />
+
+                  <XAxis
+                    dataKey="day"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#7c887f", fontSize: 12 }}
+                    dy={8}
+                  />
+
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#7c887f", fontSize: 12 }}
+                    tickFormatter={(value) => `${value}`}
+                  />
+
+                  <Tooltip
+                    formatter={(value) => [`${value} kWh`, "Energy"]}
+                    contentStyle={{
+                      borderRadius: "10px",
+                      border: "1px solid #e4ebe5",
+                      boxShadow: "0 4px 16px rgba(20, 50, 30, 0.08)",
+                    }}
+                  />
+
+                  <Area
+                    type="monotone"
+                    dataKey="energy"
+                    stroke="#28a66a"
+                    strokeWidth={3}
+                    fill="url(#energyGradient)"
+                    activeDot={{ r: 5, strokeWidth: 0 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="chart-footnote">
+              <span className="chart-legend-dot" />
+              <span>Illustrative daily energy consumption</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Green challenges */}
+        <section className="panel challenges-panel" id="challenges">
+          <SectionHeader
+            title="Green challenges"
+            subtitle="Complete small sustainability actions to earn points."
+            icon={Trophy}
+          />
+
+          <div className="challenge-progress">
+            <div className="challenge-progress-copy">
+              <span>Your session progress</span>
+              <strong>
+                {completedCount} of {initialChallenges.length} completed
+              </strong>
+            </div>
+
+            <div
+              className="progress-track"
+              role="progressbar"
+              aria-valuenow={completedCount}
+              aria-valuemin={0}
+              aria-valuemax={initialChallenges.length}
+              aria-label="Green challenges completed"
+            >
+              <div
+                className="progress-fill"
+                style={{
+                  width: `${
+                    (completedCount / initialChallenges.length) * 100
+                  }%`,
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="challenges-list">
+            {initialChallenges.map((challenge) => {
+              const completed = completedChallenges.includes(challenge.id);
+
+              return (
+                <div
+                  key={challenge.id}
+                  className={`challenge-card ${
+                    completed ? "completed" : ""
+                  }`}
+                >
+                  <button
+                    type="button"
+                    className="challenge-check"
+                    onClick={() => toggleChallenge(challenge.id)}
+                    aria-label={
+                      completed
+                        ? `Mark ${challenge.title} incomplete`
+                        : `Complete ${challenge.title}`
+                    }
+                    aria-pressed={completed}
+                  >
+                    {completed ? (
+                      <CheckCircle2 size={24} />
+                    ) : (
+                      <Circle size={24} />
+                    )}
+                  </button>
+
+                  <div className="challenge-details">
+                    <div className="challenge-title-row">
+                      <h3>{challenge.title}</h3>
+                      <span className="challenge-category">
+                        {challenge.category}
                       </span>
                     </div>
-
-                    <div className="points">
-                      +{challenge.points} <span>pts</span>
-                    </div>
+                    <p>{challenge.description}</p>
                   </div>
-                ))}
-              </div>
-            </div>
 
-            <div className="panel solar-panel">
-              <div className="solar-icon">
-                <Sun size={25} />
-              </div>
+                  <div className="challenge-points">
+                    <strong>{challenge.points}</strong>
+                    <span>points</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-              <span className="section-kicker">
-                RENEWABLE ENERGY
-              </span>
+          <p className="challenge-disclaimer">
+            Challenge completion and points are stored in the current browser
+            session only. Database persistence is not connected yet.
+          </p>
+        </section>
 
-              <h2>Explore rooftop solar</h2>
+        {/* Solar energy section */}
+        <section className="solar-banner">
+          <div className="solar-icon">
+            <Sun size={30} />
+          </div>
 
-              <p>
-                Discover how solar energy could help reduce grid
-                electricity use and household energy costs.
-              </p>
+          <div className="solar-content">
+            <p className="eyebrow">EXPLORE CLEAN ENERGY</p>
+            <h2>Make your energy use more sustainable</h2>
+            <p>
+              Consider energy-efficient appliances, rooftop solar feasibility,
+              and everyday electricity-saving habits.
+            </p>
+          </div>
 
-              <button
-                className="solar-button"
-                onClick={() => setActive("Solar Insights")}
-              >
-                Explore solar insights <ArrowUpRight size={17} />
-              </button>
+          <a
+            href="#footprint"
+            className="solar-action"
+            onClick={() => {
+              document.getElementById("electricity")?.focus();
+            }}
+          >
+            Review usage
+            <ArrowRight size={18} />
+          </a>
+        </section>
 
-              <div className="solar-decoration">
-                <Lightbulb size={76} />
-              </div>
-            </div>
-          </section>
-
-          <footer className="page-footer">
-            <span>
-              <Leaf size={14} /> MissionLiFE-Impact
-            </span>
-            <span>
-              HackCult '26 · Green Energy & Sustainability
-            </span>
-          </footer>
-        </div>
+        <footer className="dashboard-footer">
+          <span>MissionLiFE-Impact</span>
+          <span>Built to encourage sustainable everyday choices</span>
+        </footer>
       </main>
-    </div>
-  );
-}
-
-function Metric({ icon: Icon, label, value, unit, note, color }) {
-  return (
-    <div className="panel metric-card">
-      <div className={`metric-icon ${color}`}>
-        <Icon size={20} />
-      </div>
-      <span className="metric-label">{label}</span>
-      <div className="metric-value">
-        {value} <span>{unit}</span>
-      </div>
-      <div className="metric-note">{note}</div>
     </div>
   );
 }
