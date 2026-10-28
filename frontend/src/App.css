@@ -1,0 +1,1109 @@
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+/* =========================================
+   1. GLOBAL STYLES
+========================================= */
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: #e7eee9;
+  background: #0d1411;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-optical-sizing: auto;
+  font-weight: 400;
+
+  --green: #39b879;
+  --green-light: #65d895;
+  --muted: #899990;
+  --border: #25342b;
+  --panel: #131d17;
+  --background: #0d1411;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+/* =========================================
+   2. SIDEBAR
+========================================= */
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 245px;
+  background: #101813;
+  border-right: 1px solid var(--border);
+  padding: 28px 17px 18px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 8px 35px;
+}
+
+.brand-icon {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: #183a29;
+  color: #54d992;
+}
+
+.brand h2 {
+  font: 800 17px 'Manrope', sans-serif;
+  letter-spacing: -0.7px;
+  margin: 0;
+}
+
+.brand span {
+  display: block;
+  color: #8eaa98;
+  font-size: 9px;
+  letter-spacing: 1.7px;
+  margin-top: 3px;
+}
+
+.nav-label,
+.section-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: #8b9b90;
+}
+
+.nav-label {
+  padding: 0 12px 12px;
+}
+
+.sidebar nav {
+  display: grid;
+  gap: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  color: #9eada3;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.nav-item:hover {
+  background: #19261e;
+  color: #e6f4e9;
+}
+
+.nav-item.selected {
+  color: #6fe0a0;
+  background: #1a3023;
+  border-color: #284c35;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 28px;
+}
+
+.eco-card {
+  padding: 17px 15px;
+  background: linear-gradient(145deg, #193b29, #14251b);
+  border: 1px solid #2b4c36;
+  border-radius: 12px;
+  color: #6fe0a0;
+}
+
+.eco-card h3 {
+  color: #e3f3e7;
+  font: 700 14px 'Manrope', sans-serif;
+  margin: 9px 0 0;
+}
+
+.eco-card p {
+  color: #a2b9a8;
+  font-size: 11px;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+
+.sidebar-footer {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #728177;
+  padding: 22px 5px 0;
+}
+
+/* =========================================
+   3. MAIN LAYOUT AND HEADER
+========================================= */
+
+.main-content {
+  margin-left: 245px;
+  min-height: 100vh;
+}
+
+.topbar {
+  height: 70px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 0 38px;
+  background: #101713;
+}
+
+.breadcrumb {
+  font-size: 12px;
+  color: #829188;
+}
+
+.breadcrumb strong {
+  color: #dfe9e2;
+  font-weight: 500;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  color: #acb9b0;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #43c681;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border-radius: 50%;
+  margin-left: 9px;
+  background: #254a33;
+  color: #7ce4a5;
+  font-weight: 700;
+}
+
+.mobile-menu {
+  display: none;
+  place-items: center;
+  background: transparent;
+  border: none;
+  color: #dce9df;
+  padding: 5px;
+}
+
+.page-content {
+  max-width: 1400px;
+  padding: 34px 38px 20px;
+  margin: 0 auto;
+}
+
+/* =========================================
+   4. WELCOME SECTION
+========================================= */
+
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 27px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #65d895;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.welcome h1 {
+  font: 800 clamp(27px, 3vw, 36px) 'Manrope', sans-serif;
+  letter-spacing: -1.5px;
+  margin: 10px 0 7px;
+}
+
+.welcome p {
+  color: #96a59b;
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.7;
+}
+
+.date-chip {
+  border: 1px solid #2c4434;
+  border-radius: 7px;
+  padding: 10px 13px;
+  color: #b7c9bc;
+  font-size: 10px;
+  letter-spacing: 0.7px;
+  white-space: nowrap;
+}
+
+.date-chip span {
+  color: #4dd18a;
+  padding: 0 6px;
+}
+
+/* =========================================
+   5. SHARED PANELS
+========================================= */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  min-width: 0;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.panel-heading h2,
+.solar-panel h2 {
+  font: 700 17px 'Manrope', sans-serif;
+  letter-spacing: -0.4px;
+  margin: 7px 0 5px;
+}
+
+.panel-heading p {
+  color: #8d9d92;
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* =========================================
+   6. CARBON FOOTPRINT CALCULATOR
+========================================= */
+
+.calculator-panel {
+  padding: 22px;
+  margin-bottom: 17px;
+}
+
+.calculator-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.calculator-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #193a29;
+  color: #55d98c;
+}
+
+.calculator-panel h2 {
+  font: 700 18px 'Manrope', sans-serif;
+  letter-spacing: -0.4px;
+  margin: 8px 0;
+}
+
+.calculator-panel p {
+  color: #96a59b;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.calculator-form {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.calculator-form label {
+  width: 100%;
+  color: #b5c3b9;
+  font-size: 12px;
+}
+
+.calculator-form input {
+  flex: 1;
+  min-width: 160px;
+  min-height: 42px;
+  background: #0d1411;
+  border: 1px solid #34473b;
+  border-radius: 7px;
+  padding: 12px;
+  color: #e7eee9;
+  font: inherit;
+}
+
+.calculator-form input:focus {
+  outline: 2px solid #39b879;
+  outline-offset: 1px;
+}
+
+.calculator-form button {
+  min-height: 42px;
+  background: #46c77d;
+  color: #102319;
+  border: none;
+  border-radius: 7px;
+  padding: 12px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  transition: background 0.2s ease;
+}
+
+.calculator-form button:hover:not(:disabled) {
+  background: #70e09c;
+}
+
+.calculator-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.api-error {
+  color: #ff9b9b !important;
+  font-size: 12px;
+  margin-top: 15px;
+}
+
+.calculation-result {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #25342b;
+}
+
+.calculation-result > span {
+  color: #a7b6aa;
+  font-size: 12px;
+}
+
+.calculation-result h3 {
+  color: #65d895;
+  font: 800 28px 'Manrope', sans-serif;
+  letter-spacing: -0.7px;
+  margin: 8px 0;
+}
+
+.calculation-result p {
+  margin: 8px 0 15px;
+}
+
+.result-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 15px;
+  margin: 12px 0;
+  font-size: 12px;
+}
+
+.result-details span {
+  color: #96a59b;
+}
+
+.result-details strong {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.recommendations-title {
+  display: block;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #dfe9e2;
+}
+
+.calculation-result ul {
+  padding-left: 20px;
+  line-height: 1.9;
+  margin-bottom: 0;
+}
+
+.calculation-result li {
+  color: #a7b6aa;
+  font-size: 12px;
+}
+
+/* =========================================
+   7. METRIC CARDS
+========================================= */
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+  margin-bottom: 17px;
+}
+
+.metric-card {
+  padding: 18px 17px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.metric-icon {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.metric-icon.green {
+  background: #193a29;
+  color: #55d98c;
+}
+
+.metric-icon.amber {
+  background: #3c301b;
+  color: #edbd60;
+}
+
+.metric-icon.purple {
+  background: #302444;
+  color: #c59aff;
+}
+
+.metric-icon.blue {
+  background: #1e3040;
+  color: #80c9ed;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: #a2b0a6;
+}
+
+.metric-value {
+  font: 800 clamp(22px, 2.3vw, 29px) 'Manrope', sans-serif;
+  letter-spacing: -1px;
+  margin: 9px 0;
+  overflow-wrap: anywhere;
+}
+
+.metric-value span {
+  font: 500 11px 'DM Sans', sans-serif;
+  letter-spacing: 0;
+  color: #9aa89f;
+}
+
+.metric-note {
+  font-size: 10px;
+  color: #84948a;
+  line-height: 1.6;
+}
+
+/* =========================================
+   8. ANALYTICS AND SCORE LAYOUT
+========================================= */
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(270px, 1fr);
+  gap: 17px;
+  margin-bottom: 17px;
+}
+
+.energy-panel,
+.score-panel,
+.challenges-panel {
+  padding: 22px;
+  min-width: 0;
+}
+
+.chart-icon {
+  display: grid;
+  place-items: center;
+  width: 37px;
+  height: 37px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #1a3525;
+  color: #51d78a;
+}
+
+.chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 27px;
+  color: #b5c3b9;
+  font-size: 10px;
+}
+
+.chart-legend > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-legend i {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #39b879;
+}
+
+.chart-period {
+  color: #829288;
+  letter-spacing: 1px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.chart-container {
+  height: 200px;
+  width: 100%;
+  margin-top: 13px;
+}
+
+.chart-footnote {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  color: #829288;
+  margin-top: 5px;
+}
+
+.chart-footnote span {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e5b957;
+}
+
+/* =========================================
+   9. GREEN IMPACT SCORE
+========================================= */
+
+.score-circle {
+  width: 142px;
+  height: 142px;
+  border-radius: 50%;
+  border: 8px solid #254734;
+  border-top-color: #4fd18a;
+  border-right-color: #4fd18a;
+  display: grid;
+  place-items: center;
+  margin: 24px auto 15px;
+  transform: rotate(-35deg);
+}
+
+.score-circle > div {
+  transform: rotate(35deg);
+  display: grid;
+  text-align: center;
+  gap: 4px;
+}
+
+.score-circle strong {
+  font: 800 36px 'Manrope', sans-serif;
+}
+
+.score-circle span {
+  font-size: 9px;
+  color: #91a397;
+  letter-spacing: 1px;
+}
+
+.score-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #70d99a;
+  font-size: 10px;
+  text-align: center;
+}
+
+.score-divider {
+  border-top: 1px solid var(--border);
+  margin: 20px 0 15px;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #9caea2;
+  font-size: 10px;
+  margin: 12px 0;
+}
+
+.score-row strong {
+  color: #e1ece4;
+}
+
+.progress-track {
+  height: 5px;
+  border-radius: 10px;
+  background: #26372b;
+  overflow: hidden;
+}
+
+.progress-track > div {
+  height: 100%;
+  background: #43c681;
+  border-radius: inherit;
+  transition: width 0.25s ease;
+}
+
+/* =========================================
+   10. CHALLENGES AND SOLAR SECTION
+========================================= */
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
+  gap: 17px;
+}
+
+.count-badge {
+  background: #1c3224;
+  color: #75d99a;
+  border-radius: 5px;
+  padding: 7px 9px;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.challenge-list {
+  margin-top: 17px;
+}
+
+.challenge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid #253229;
+}
+
+.challenge-check {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border: 1px solid #4b6653;
+  border-radius: 7px;
+  color: #4fd18a;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.challenge-check:hover {
+  background: #1b3827;
+}
+
+.challenge-done .challenge-check {
+  background: #1b4b2d;
+  border-color: #43bd77;
+}
+
+.challenge-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.challenge-text strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.challenge-text span {
+  display: block;
+  color: #829288;
+  font-size: 10px;
+  margin-top: 4px;
+}
+
+.challenge-done .challenge-text strong {
+  color: #8fa497;
+  text-decoration: line-through;
+}
+
+.points {
+  color: #68d999;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.points span {
+  font-size: 9px;
+  color: #8c9e92;
+  font-weight: 400;
+}
+
+/* Solar panel */
+
+.solar-panel {
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(140deg, #193c28, #14251a 75%);
+  border-color: #2d4d35;
+}
+
+.solar-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #29492c;
+  color: #f2ce71;
+  margin-bottom: 22px;
+}
+
+.solar-panel h2 {
+  font-size: 20px;
+  margin-top: 10px;
+  max-width: 230px;
+}
+
+.solar-panel > p {
+  color: #a6b9aa;
+  font-size: 11px;
+  line-height: 1.9;
+  max-width: 290px;
+  position: relative;
+  z-index: 1;
+}
+
+.solar-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #46c77d;
+  color: #102319;
+  border: none;
+  border-radius: 7px;
+  padding: 11px 13px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-top: 19px;
+  position: relative;
+  z-index: 1;
+  transition: background 0.2s ease;
+}
+
+.solar-button:hover {
+  background: #70e09c;
+}
+
+.solar-decoration {
+  position: absolute;
+  right: -13px;
+  bottom: -13px;
+  color: #a6d4a8;
+  opacity: 0.08;
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+
+/* =========================================
+   11. FOOTER
+========================================= */
+
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+  border-top: 1px solid var(--border);
+  padding-top: 17px;
+  color: #75867a;
+  font-size: 10px;
+}
+
+.page-footer span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #8eab96;
+}
+
+/* =========================================
+   12. TABLET RESPONSIVENESS
+========================================= */
+
+@media (min-width: 1500px) {
+  .page-content {
+    padding-top: 40px;
+  }
+
+  .chart-container {
+    height: 230px;
+  }
+}
+
+@media (max-width: 1150px) {
+  .sidebar {
+    width: 215px;
+  }
+
+  .main-content {
+    margin-left: 215px;
+  }
+
+  .page-content {
+    padding: 27px 22px 20px;
+  }
+
+  .topbar {
+    padding: 0 22px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .content-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(240px, 1fr);
+  }
+
+  .bottom-grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(230px, 1fr);
+  }
+}
+
+/* =========================================
+   13. MOBILE RESPONSIVENESS
+========================================= */
+
+@media (max-width: 800px) {
+  .sidebar {
+    width: 245px;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: none;
+  }
+
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+    box-shadow: 15px 0 45px #0008;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .mobile-menu {
+    display: grid;
+  }
+
+  .topbar {
+    gap: 12px;
+    height: 60px;
+    padding: 0 16px;
+  }
+
+  .breadcrumb {
+    margin-right: auto;
+  }
+
+  .profile > span:not(.status-dot) {
+    display: none;
+  }
+
+  .page-content {
+    padding: 26px 16px;
+  }
+
+  .content-grid,
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome {
+    align-items: flex-start;
+  }
+
+  .date-chip {
+    display: none;
+  }
+
+  .solar-panel h2 {
+    max-width: 100%;
+  }
+}
+
+/* =========================================
+   14. SMALL MOBILE SCREENS
+========================================= */
+
+@media (max-width: 460px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .metric-card {
+    padding: 13px 11px;
+  }
+
+  .metric-label {
+    font-size: 10px;
+  }
+
+  .metric-note {
+    font-size: 9px;
+  }
+
+  .metric-value {
+    font-size: 22px;
+  }
+
+  .energy-panel,
+  .score-panel,
+  .challenges-panel {
+    padding: 16px;
+  }
+
+  .calculator-panel {
+    padding: 16px;
+  }
+
+  .calculator-panel h2 {
+    font-size: 16px;
+  }
+
+  .panel-heading h2 {
+    font-size: 15px;
+  }
+
+  .chart-container {
+    height: 180px;
+  }
+
+  .page-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .welcome h1 {
+    font-size: 27px;
+  }
+
+  .welcome p {
+    max-width: 290px;
+  }
+
+  .calculator-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .calculator-form input,
+  .calculator-form button {
+    width: 100%;
+  }
+
+  .calculator-heading {
+    align-items: flex-start;
+  }
+
+  .result-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .count-badge {
+    font-size: 8px;
+    padding: 6px 7px;
+  }
+
+  .challenge-row {
+    gap: 9px;
+  }
+}
