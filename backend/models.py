@@ -1,27 +1,37 @@
-
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     Column,
     DateTime,
     Float,
     Integer,
     String,
-    UniqueConstraint,
 )
 
 from database import Base
 
+
+# --------------------------------------------------
+# ENERGY READINGS
+# --------------------------------------------------
 
 class EnergyReading(Base):
     __tablename__ = "energy_readings"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # Format: YYYY-MM, for example 2026-10.
-    month = Column(String(7), nullable=False, unique=True, index=True)
+    month = Column(
+        String,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
 
-    electricity_kwh = Column(Float, nullable=False)
+    electricity_kwh = Column(
+        Float,
+        nullable=False,
+    )
 
     created_at = Column(
         DateTime,
@@ -30,20 +40,75 @@ class EnergyReading(Base):
     )
 
 
+# --------------------------------------------------
+# GREEN CHALLENGE COMPLETIONS
+# --------------------------------------------------
+
 class ChallengeCompletion(Base):
     __tablename__ = "challenge_completions"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # Use a stable identifier, such as "switch-off-lights".
-    challenge_id = Column(String(100), nullable=False, unique=True)
+    challenge_id = Column(
+        String,
+        nullable=False,
+        unique=True,
+        index=True,
+    )
 
-    title = Column(String(200), nullable=False)
+    title = Column(
+        String,
+        nullable=False,
+    )
 
-    points = Column(Integer, nullable=False, default=0)
+    points = Column(
+        Integer,
+        nullable=False,
+        default=0,
+    )
 
     completed_at = Column(
         DateTime,
         default=datetime.utcnow,
+        nullable=False,
+    )
+
+
+# --------------------------------------------------
+# RECOMMENDATION FEEDBACK AND ACTION TRACKING
+# --------------------------------------------------
+
+class RecommendationFeedback(Base):
+    __tablename__ = "recommendation_feedback"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    recommendation_id = Column(
+        String,
+        nullable=False,
+        index=True,
+    )
+
+    helpful = Column(
+        Boolean,
+        nullable=True,
+    )
+
+    action_completed = Column(
+        Boolean,
+        nullable=False,
+        default=False,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
         nullable=False,
     )

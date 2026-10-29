@@ -37,6 +37,10 @@ import {
   getChallenges,
   completeChallenge,
   uncompleteChallenge,
+  submitRecommendationFeedback,
+  updateRecommendationAction,
+  getRecommendationFeedback,
+  getRecommendations,
 } from "./api";
 
 import "./App.css";
@@ -150,6 +154,15 @@ export default function App() {
   const [challengeError, setChallengeError] = useState("");
   const [challengeLoading, setChallengeLoading] = useState(true);
 
+  // Recommendation feedback and action tracking
+  const [recommendationFeedback, setRecommendationFeedback] = useState({});
+  const [recommendationBusy, setRecommendationBusy] = useState({});
+  const [recommendationMessage, setRecommendationMessage] = useState("");
+  const [recommendationError, setRecommendationError] = useState("");
+  const [recommendations, setRecommendations] = useState([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
+  const [recommendationsError, setRecommendationsError] = useState("");
+
   const completedPoints = challenges.reduce(
     (total, challenge) =>
       challenge.completed ? total + challenge.points : total,
@@ -219,9 +232,49 @@ export default function App() {
     }
   }
 
+  // Load personalized recommendations generated from saved energy readings.
+  async function loadRecommendations() {
+    setRecommendationsLoading(true);
+    setRecommendationsError("");
+
+    try {
+      const data = await getRecommendations();
+      setRecommendations(Array.isArray(data.recommendations) ? data.recommendations : []);
+    } catch (err) {
+      setRecommendationsError(
+        err.message || "Could not load personalized recommendations. Check the backend."
+      );
+    } finally {
+      setRecommendationsLoading(false);
+    }
+  }
+
+  async function loadRecommendationFeedback() {
+    try {
+      const data = await getRecommendationFeedback();
+      const saved = {};
+      for (const record of data.feedback || []) {
+        // The latest record for a recommendation wins.
+        if (!(record.recommendation_id in saved)) {
+          saved[record.recommendation_id] = {
+            helpful: record.helpful,
+            action_completed: Boolean(record.action_completed),
+          };
+        }
+      }
+      setRecommendationFeedback(saved);
+    } catch (err) {
+      setRecommendationError(
+        "Could not load saved recommendation feedback. Check that the backend is running."
+      );
+    }
+  }
+
   useEffect(() => {
     loadEnergyData();
     loadChallenges();
+    loadRecommendationFeedback();
+    loadRecommendations();
   }, []);
 
   // Carbon footprint calculator.
@@ -251,6 +304,52 @@ export default function App() {
     }
   }
 
+  async function handleRecommendationFeedback(recommendationId, helpful) {
+    setRecommendationBusy((previous) => ({ ...previous, [recommendationId]: true }));
+    setRecommendationMessage("");
+    setRecommendationError("");
+
+    try {
+      const result = await submitRecommendationFeedback(recommendationId, helpful);
+      setRecommendationFeedback((previous) => ({
+        ...previous,
+        [recommendationId]: {
+          helpful: result.helpful,
+          action_completed: Boolean(result.action_completed),
+        },
+      }));
+      setRecommendationMessage("Thanks. Your feedback has been saved.");
+    } catch (err) {
+      setRecommendationError(err.message || "Could not save recommendation feedback.");
+    } finally {
+      setRecommendationBusy((previous) => ({ ...previous, [recommendationId]: false }));
+    }
+  }
+
+  async function handleRecommendationAction(recommendationId, actionCompleted) {
+    setRecommendationBusy((previous) => ({ ...previous, [recommendationId]: true }));
+    setRecommendationMessage("");
+    setRecommendationError("");
+
+    try {
+      const result = await updateRecommendationAction(recommendationId, actionCompleted);
+      setRecommendationFeedback((previous) => ({
+        ...previous,
+        [recommendationId]: {
+          helpful: previous[recommendationId]?.helpful ?? null,
+          action_completed: Boolean(result.action_completed),
+        },
+      }));
+      setRecommendationMessage(
+        result.action_completed ? "Action marked as completed." : "Action marked as not completed."
+      );
+    } catch (err) {
+      setRecommendationError(err.message || "Could not update action status.");
+    } finally {
+      setRecommendationBusy((previous) => ({ ...previous, [recommendationId]: false }));
+    }
+  }
+
   // Save or update a monthly reading in SQLite.
   async function handleSaveReading(event) {
     event.preventDefault();
@@ -277,6 +376,7 @@ export default function App() {
       const result = await saveEnergyReading(readingMonth, value);
 
       await loadEnergyData();
+      await loadRecommendations();
 
       setSaveMessage(
         `${result.month} reading saved successfully: ${result.electricity_kwh} kWh.`
@@ -396,6 +496,11 @@ export default function App() {
           <a href="#energy-tracker" className="nav-link">
             <Zap size={19} />
             <span>Energy Tracker</span>
+          </a>
+
+          <a href="#recommendations" className="nav-link">
+            <Lightbulb size={19} />
+            <span>Recommendations</span>
           </a>
 
           <a href="#challenges" className="nav-link">
@@ -622,13 +727,50 @@ export default function App() {
                   <div className="recommendations">
                     <h3>Recommended actions</h3>
 
+                    {recommendationMessage && (
+                      <div className="result-topline" role="status" style={{ marginBottom: 10 }}>
+                        <CheckCircle2 size={17} />
+                        <span>{recommendationMessage}</span>
+                      </div>
+                    )}
+                    {recommendationError && (
+                      <div className="error-message" role="alert" style={{ marginBottom: 10 }}>
+                        <AlertCircle size={17} />
+                        <span>{recommendationError}</span>
+                        <button type="button" className="secondary-button" onClick={loadRecommendationFeedback}>
+                          Retry
+                        </button>
+                      </div>
+                    )}
                     <ul>
-                      {footprintResult.recommendations.map((item, index) => (
-                        <li key={`${index}-${item}`}>
-                          <CheckCircle2 size={16} />
-                          <span>{item}</span>
-                        </li>
-                      ))}
+                      {footprintResult.recommendations.map((item, index) => {
+                        const recommendationId = `footprint-${index}`;
+                        const saved = recommendationFeedback[recommendationId];
+                        const busy = Boolean(recommendationBusy[recommendationId]);
+                        return (
+                          <li key={`${index}-${item}`} style={{ alignItems: "flex-start", flexWrap: "wrap" }}>
+                            <CheckCircle2 size={16} />
+                            <div style={{ flex: "1 1 240px" }}>
+                              <span>{item}</span>
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
+                                <button type="button" className="secondary-button" disabled={busy} aria-pressed={saved?.helpful === true} onClick={() => handleRecommendationFeedback(recommendationId, true)}>
+                                  Helpful
+                                </button>
+                                <button type="button" className="secondary-button" disabled={busy} aria-pressed={saved?.helpful === false} onClick={() => handleRecommendationFeedback(recommendationId, false)}>
+                                  Not helpful
+                                </button>
+                                <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12 }}>
+                                  <input type="checkbox" checked={Boolean(saved?.action_completed)} disabled={busy} onChange={(event) => handleRecommendationAction(recommendationId, event.target.checked)} />
+                                  Mark action completed
+                                </label>
+                              </div>
+                              {saved?.helpful === true && <small>Feedback: helpful</small>}
+                              {saved?.helpful === false && <small>Feedback: not helpful</small>}
+                              {saved?.action_completed && <small style={{ display: "block" }}>Action completed</small>}
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}
@@ -918,6 +1060,110 @@ export default function App() {
           {summary && (
             <p className="challenge-disclaimer">{summary.message}</p>
           )}
+        </section>
+
+        {/* Personalized recommendations: generated from saved energy data */}
+        <section className="panel challenges-panel" id="recommendations">
+          <SectionHeader
+            title="Personalized energy insights"
+            subtitle="Recommendations based on your saved monthly electricity readings—not repeatable challenges."
+            icon={Lightbulb}
+          />
+
+          {recommendationMessage && (
+            <div className="result-topline" role="status" style={{ marginBottom: 12 }}>
+              <CheckCircle2 size={17} />
+              <span>{recommendationMessage}</span>
+            </div>
+          )}
+
+          {recommendationError && (
+            <div className="error-message" role="alert" style={{ marginBottom: 12 }}>
+              <AlertCircle size={17} />
+              <span>{recommendationError}</span>
+              <button type="button" className="secondary-button" onClick={loadRecommendationFeedback}>Retry feedback</button>
+            </div>
+          )}
+
+          {recommendationsError && (
+            <div className="error-message" role="alert" style={{ marginBottom: 12 }}>
+              <AlertCircle size={17} />
+              <span>{recommendationsError}</span>
+              <button type="button" className="secondary-button" onClick={loadRecommendations} disabled={recommendationsLoading}>Retry recommendations</button>
+            </div>
+          )}
+
+          {recommendationsLoading ? (
+            <div className="empty-state">
+              <LoaderCircle className="spin" size={24} />
+              <p>Analyzing your saved energy readings...</p>
+            </div>
+          ) : recommendations.length === 0 ? (
+            <div className="empty-state">
+              <Lightbulb size={28} />
+              <h3>No recommendations available</h3>
+              <p>Save a monthly energy reading to generate personalized insights.</p>
+              <button type="button" className="secondary-button" onClick={loadRecommendations}>Refresh insights</button>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 16 }}>
+              {recommendations.map((item) => {
+                const recommendationId = item.id;
+                const saved = recommendationFeedback[recommendationId];
+                const busy = Boolean(recommendationBusy[recommendationId]);
+                const priority = (item.priority || "medium").toLowerCase();
+
+                return (
+                  <article key={recommendationId} style={{ border: "1px solid #e2ebe4", borderRadius: 14, padding: 20, background: "#fff", display: "flex", flexDirection: "column", gap: 12, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+                      <div style={{ minWidth: 0 }}>
+                        <span style={{ display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "#208653", marginBottom: 7 }}>
+                          {item.category || "Energy insight"}
+                        </span>
+                        <h3 style={{ margin: 0, fontSize: 18, lineHeight: 1.35, color: "#20372b" }}>{item.title}</h3>
+                      </div>
+                      <span style={{ flexShrink: 0, borderRadius: 999, padding: "5px 9px", fontSize: 11, fontWeight: 700, textTransform: "capitalize", color: priority === "high" ? "#a33b32" : priority === "medium" ? "#946200" : "#28734a", background: priority === "high" ? "#fff0ee" : priority === "medium" ? "#fff6df" : "#eaf6ee" }}>
+                        {priority} priority
+                      </span>
+                    </div>
+
+                    <p style={{ margin: 0, lineHeight: 1.65, color: "#58675e", fontSize: 14 }}>{item.description}</p>
+
+                    {item.reason && (
+                      <div style={{ borderLeft: "3px solid #b9dfc6", padding: "8px 10px", background: "#f5faf6", borderRadius: "0 8px 8px 0" }}>
+                        <strong style={{ display: "block", fontSize: 11, textTransform: "uppercase", color: "#54705d", marginBottom: 4 }}>Why this appears</strong>
+                        <p style={{ margin: 0, color: "#5c6d62", fontSize: 12, lineHeight: 1.5 }}>{item.reason}</p>
+                      </div>
+                    )}
+
+                    {(item.current_value_kwh != null || item.target_value_kwh != null) && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        {item.current_value_kwh != null && <span style={{ padding: "7px 9px", borderRadius: 8, background: "#f3f6f3", fontSize: 12, color: "#435349" }}>Current: <strong>{item.current_value_kwh} kWh</strong></span>}
+                        {item.target_value_kwh != null && <span style={{ padding: "7px 9px", borderRadius: 8, background: "#eaf6ee", fontSize: 12, color: "#24764a" }}>Target: <strong>{item.target_value_kwh} kWh</strong></span>}
+                      </div>
+                    )}
+
+                    <div style={{ borderTop: "1px solid #edf1ed", paddingTop: 12, marginTop: "auto" }}>
+                      <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: "#637168", textTransform: "uppercase" }}>Was this insight useful?</p>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        <button type="button" className="secondary-button" disabled={busy} aria-pressed={saved?.helpful === true} onClick={() => handleRecommendationFeedback(recommendationId, true)} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "auto", minWidth: 104, minHeight: 40, padding: "10px 16px", whiteSpace: "nowrap", wordBreak: "normal", overflowWrap: "normal", flexShrink: 0, lineHeight: 1.2, borderRadius: 9, borderColor: saved?.helpful === true ? "#278653" : undefined, background: saved?.helpful === true ? "#e7f5eb" : undefined }}>Helpful</button>
+                        <button type="button" className="secondary-button" disabled={busy} aria-pressed={saved?.helpful === false} onClick={() => handleRecommendationFeedback(recommendationId, false)} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "auto", minWidth: 104, minHeight: 40, padding: "10px 16px", whiteSpace: "nowrap", wordBreak: "normal", overflowWrap: "normal", flexShrink: 0, lineHeight: 1.2, borderRadius: 9, borderColor: saved?.helpful === false ? "#278653" : undefined, background: saved?.helpful === false ? "#e7f5eb" : undefined }}>Not helpful</button>
+                      </div>
+                    </div>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: 9, padding: 11, borderRadius: 9, border: "1px solid #e2ebe4", background: saved?.action_completed ? "#eef8f0" : "#f7f9f7", fontSize: 13, fontWeight: 600, color: "#385344", cursor: busy ? "wait" : "pointer" }}>
+                      <input type="checkbox" checked={Boolean(saved?.action_completed)} disabled={busy} onChange={(event) => handleRecommendationAction(recommendationId, event.target.checked)} />
+                      {saved?.action_completed ? "Action marked completed" : "Mark action as completed"}
+                    </label>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+          <p className="challenge-disclaimer" style={{ marginTop: 16 }}>
+            Insights are generated from saved energy readings. A completed action records your report; energy savings should be verified against later readings.
+          </p>
         </section>
 
         {/* Green challenges */}

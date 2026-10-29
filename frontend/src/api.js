@@ -78,3 +78,62 @@ export function uncompleteChallenge(challengeId) {
     }
   );
 }
+
+// --------------------------------------------------
+// MONTHLY IMPACT REPORT
+// --------------------------------------------------
+
+export function getMonthlyImpactReport() {
+  return apiRequest("/api/reports/monthly-impact");
+}
+
+// --------------------------------------------------
+// RECOMMENDATIONS
+// --------------------------------------------------
+
+export function getRecommendations() {
+  return apiRequest("/api/recommendations");
+}
+
+// --------------------------------------------------
+// RECOMMENDATION FEEDBACK
+// --------------------------------------------------
+
+export function submitRecommendationFeedback(recommendationId, helpful) {
+  return apiRequest(
+    `/api/recommendations/${encodeURIComponent(recommendationId)}/feedback`,
+    {
+      method: "POST",
+      body: JSON.stringify({
+        helpful: Boolean(helpful),
+      }),
+    }
+  );
+}
+
+// --------------------------------------------------
+// RECOMMENDATION ACTION TRACKING
+// --------------------------------------------------
+
+export function updateRecommendationAction(
+  recommendationId,
+  actionCompleted
+) {
+  return apiRequest(
+    `/api/recommendations/${encodeURIComponent(recommendationId)}/action`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        action_completed: Boolean(actionCompleted),
+      }),
+    }
+  );
+}
+
+// --------------------------------------------------
+// GET SAVED RECOMMENDATION FEEDBACK
+// --------------------------------------------------
+
+export function getRecommendationFeedback() {
+  return apiRequest("/api/recommendations/feedback");
+}
